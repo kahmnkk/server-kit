@@ -1,7 +1,9 @@
 const config = {
     dev: true,
     baseUrl: '127.0.0.1',
-    port: 3000,
+    port: {
+        api: 3000,
+    },
     mysql: {
         master: {
             host: '127.0.0.1',
