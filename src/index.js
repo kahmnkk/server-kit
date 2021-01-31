@@ -2,10 +2,12 @@ require('module-alias/register');
 
 const config = require('@root/config');
 const errors = require('@src/errors');
-const logger = require('@src/utils/logger');
 
 const service = require('@src/service/service');
 const ApiService = require('@src/service/ApiService');
+
+const utils = require('@src/utils/utils');
+const logger = require('@src/utils/logger');
 
 async function initApiService() {
     const apiService = new ApiService({
@@ -17,7 +19,7 @@ async function initApiService() {
     await apiService.init();
     await apiService.run((err) => {
         if (err) throw err;
-        logger.log('api service running.');
+        logger.info('api service running.');
         service.api = apiService;
     });
 }
@@ -32,7 +34,7 @@ async function proc(serverType) {
                 break;
 
             default:
-                throw errors.undefinedServer;
+                throw utils.errorHandling(errors.undefinedServer);
         }
     } catch (err) {
         logger.error(err);

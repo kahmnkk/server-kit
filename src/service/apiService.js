@@ -19,13 +19,15 @@ const logger = require('@src/utils/logger');
 const dbMgr = require('@src/database/dbMgr');
 
 // Api Router
-const routerIndex = require('@src/api/index');
+const routerUser = require('@src/api/user/index');
 
 class ApiService {
     constructor(options) {
-        if (!options.sessionStore) throw errors['invalidSessionStore'];
+        if (!options.sessionStore) {
+            throw utils.errorHandling(errors.invalidSessionStore);
+        }
 
-        this.port = 6100;
+        this.port = options.port;
         this.app = express();
         options.secret = '';
 
@@ -34,10 +36,12 @@ class ApiService {
 
         this.app.use(
             session({
-                store: new sessionStore(redis.createClient(options.sessionStore)),
                 secret: 'a!i-@e#v$r-%k^p&o*l(',
                 resave: false,
                 saveUninitialized: true,
+                cookie: {
+                    maxAge: 1000 * 60 * 60 * 24,
+                },
             }),
         );
 
@@ -56,11 +60,11 @@ class ApiService {
                 reqs['params'] = req.query;
             }
 
-            logger.log('[' + req['txid'] + '] req: ' + JSON.stringify(reqs));
+            logger.info('[' + req['txid'] + '] req: ' + JSON.stringify(reqs));
             next();
         });
 
-        this.app.use('/index', routerIndex);
+        this.app.use('/user', routerUser);
 
         this.app.use((req, res, next) => {
             let err = new Error('404 Not Found');
@@ -70,11 +74,11 @@ class ApiService {
 
         this.app.use((err, req, res, next) => {
             res.status(err['status'] || 500);
-            const data = JSON.stringify({
+            const data = {
                 message: err.message,
                 error: err,
-            });
-            logger.log('[' + req['txid'] + '] res: ' + JSON.stringify(data));
+            };
+            logger.error('[' + req['txid'] + '] res: ' + JSON.stringify(data));
             res.send(data);
         });
 

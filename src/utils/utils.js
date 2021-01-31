@@ -4,8 +4,6 @@ const rp = require('request-promise');
 const config = require('@root/config');
 const errors = require('@src/errors');
 
-const dev = true;
-
 class Utils {
     constructor() {}
 
@@ -119,12 +117,12 @@ class Utils {
     }
 
     setRoute(router, url, func) {
-        if (dev == true) router.get(url, func);
+        if (config.dev == true) router.get(url, func);
         router.post(url, func);
     }
 
     setMulterRoute(router, url, multer, func) {
-        if (dev == true) router.get(url, multer, func);
+        if (config.dev == true) router.get(url, multer, func);
         router.post(url, multer, func);
     }
 

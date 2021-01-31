@@ -16,9 +16,28 @@ const errors = {
         message: 'undefined module',
     },
 
+    // DataBases
     failedQuery: {
         code: 1001,
         message: 'failed query',
+    },
+
+    // Api
+    invalidSessionStore: {
+        code: 10001,
+        message: 'invalid session store',
+    },
+    invalidRequestRouter: {
+        code: 10002,
+        message: 'invalid request router',
+    },
+    invalidRequestData: {
+        code: 10003,
+        message: 'invalid request data',
+    },
+    invalidResponseData: {
+        code: 10004,
+        message: 'invalid response data',
     },
 };
 
