@@ -24,7 +24,9 @@ Install project dependencies
 yarn install
 ```
 
-Run server you want - package.json.scripts
+## Example
+
+Run server you want - package.json scripts
 
 ```
 yarn api
