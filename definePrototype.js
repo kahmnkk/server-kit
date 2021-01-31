@@ -1,6 +1,3 @@
-// https://github.com/ilearnio/module-alias
-require('module-alias/register');
-
 Object.defineProperty(Array.prototype, 'select', {
     value: (closure) => {
         for (let i = 0; i < this.length; ++i) {

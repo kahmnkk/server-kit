@@ -1,3 +1,4 @@
+// https://github.com/ilearnio/module-alias
 require('module-alias/register');
 
 const config = require('@root/config');
