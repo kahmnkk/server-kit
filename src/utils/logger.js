@@ -19,7 +19,9 @@ class Logger {
         this.workerId = 0;
 
         this.devLogger = null;
-        this.devIdx = 0;
+
+        this.fileIdx = 0;
+        this.consoleIdx = 0;
     }
 
     init(serverType) {
@@ -116,7 +118,7 @@ class Logger {
 
         // dev 로그
         if (debugmode == true) {
-            console.log('[' + lsw + '] ' + data);
+            console.log(`${this.consoleIdx++} ${this.getDateFormat(new Date())}[${lsw}] ${data}`);
         }
 
         if (this.devLogger == null) {
@@ -128,14 +130,13 @@ class Logger {
                         frequency: `${cutMin}m`,
                         zippedArchive: false,
                         datePattern: 'YYYY-MM-DD-HH-mm',
-                        format: winston.format.printf((info) => `${this.devIdx++} ${this.getDateFormat(new Date())}[${this.levelStringFromWinstonString(info.level)}] - ${info.message}`),
+                        format: winston.format.printf((info) => `${this.fileIdx++} ${this.getDateFormat(new Date())}[${this.levelStringFromWinstonString(info.level)}] - ${info.message}`),
                     }),
 
                     new winston.transports.Console({
                         format: winston.format.combine(
                             winston.format.colorize(),
-                            // winston.format.simple(), // `${info.level}: ${info.message} JSON.stringify({ ...rest })` 포맷으로 출력
-                            winston.format.printf((info) => `[${info.level}] - ${info.message}`),
+                            winston.format.printf((info) => `${this.consoleIdx++} ${this.getDateFormat(new Date())}[${info.level}] - ${info.message}`),
                         ),
                     }),
                 ],
