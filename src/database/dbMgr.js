@@ -44,7 +44,7 @@ class dbMgr {
 
             this.redis[dbName] = initRedis;
             this.redis[dbName].client.on('error', (err) => {
-                logger.error('redis' + dbName + ' error: ' + err);
+                logger.error('redis ' + dbName + ' error: ' + err);
             });
         }
     }
