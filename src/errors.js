@@ -21,6 +21,10 @@ const errors = {
         code: 1001,
         message: 'failed query',
     },
+    failedCache: {
+        code: 1002,
+        message: 'failed cache',
+    },
 
     // Api
     invalidSessionStore: {
