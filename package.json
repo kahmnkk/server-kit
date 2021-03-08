@@ -13,7 +13,9 @@
     },
     "dependencies": {
         "async-redis": "^1.1.7",
+        "clone-deep": "^4.0.1",
         "connect-redis": "^5.0.0",
+        "crypto": "^1.0.1",
         "express": "^4.17.1",
         "express-session": "^1.17.1",
         "module-alias": "^2.2.2",
@@ -22,7 +24,7 @@
         "request-promise": "^4.2.6",
         "socket.io": "^3.1.0",
         "socket.io-redis": "^6.0.1",
-        "uniqid": "^5.2.0",
+        "uniqid": "^5.3.0",
         "winston": "^3.3.3",
         "winston-daily-rotate-file": "^4.5.0"
     }

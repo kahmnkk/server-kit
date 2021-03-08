@@ -101,6 +101,19 @@ class Utils {
         return true;
     }
 
+    /**
+     *
+     * @param {Object} asis
+     * @param {Object} tobe
+     */
+    mergeObj(asis, tobe) {
+        for (let k in tobe) {
+            if (asis.hasOwnProperty(k) == true) {
+                asis[k] = tobe[k];
+            }
+        }
+    }
+
     injectPromise(func, ...args) {
         return new Promise((resolve, reject) => {
             func(...args, (err, res) => {
