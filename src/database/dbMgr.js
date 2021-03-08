@@ -9,17 +9,51 @@ const logger = require('@src/utils/logger');
 const MySQL = require('@src/database/mysql');
 const Redis = require('@src/database/redis');
 
-class dbMgr {
+// Model
+const BaseModel = require('@src/model/baseModel');
+
+const mysqlConn = {
+    master: 'master',
+    user: 'user',
+};
+
+const redisConn = {
+    sessionStorage: 'sessionStorage',
+    gen: 'gen',
+    user: 'user',
+};
+
+const queryFrame = {
+    querys: [],
+    cmds: [],
+};
+
+class dbMgr extends BaseModel {
     constructor() {
+        super();
+
         this.mysql = {
-            master: null,
+            master: /** @type {MySQL} */ (null),
+            user: /** @type {MySQL} */ (null),
         };
 
         this.redis = {
-            sessionStore: null,
-            user: null,
-            gen: null,
+            sessionStore: /** @type {Redis} */ (null),
+            user: /** @type {Redis} */ (null),
+            gen: /** @type {Redis} */ (null),
         };
+    }
+
+    get mysqlConn()     { return mysqlConn; } // prettier-ignore
+    get redisConn()     { return redisConn; } // prettier-ignore
+
+    /**
+     * @override
+     * @returns {queryFrame}
+     */
+    getQueryFrame(initData = null) {
+        const rtn = super.getFrame(queryFrame, initData);
+        return rtn;
     }
 
     async init() {
@@ -47,6 +81,72 @@ class dbMgr {
                 logger.error('redis ' + dbName + ' error: ' + err);
             });
         }
+    }
+
+    /**
+     *
+     * @param {typeof mysqlConn| typeof redisConn} dbConn
+     * @param {queryFrame} querys
+     */
+    async set(dbConn, querys) {
+        if (querys.querys.length > 0 || this.mysql[dbConn] != null) {
+            const mysqlObj = /** @type {MySQL} */ (this.mysql[dbConn]);
+            const mysqlQuerys = mysqlObj.makeMultipleQuery(querys.querys);
+            const mysqlConn = await mysqlObj.beginTransaction();
+
+            try {
+                await mysqlObj.query(mysqlConn, mysqlQuerys);
+                await mysqlObj.commit(mysqlConn);
+            } catch (err) {
+                await mysqlObj.rollback(mysqlConn);
+                throw err;
+            }
+        }
+
+        if (querys.cmds.length > 0 || this.redis[dbConn] != null) {
+            const redisObj = /** @type {Redis} */ (this.redis[dbConn]);
+
+            try {
+                // Redis Set
+                await redisObj.multiCmd(querys.cmds);
+            } catch (err) {
+                throw err;
+            }
+        }
+    }
+
+    async getFromCache(dbConn, key, query = null) {
+        let rtn = [];
+
+        const redisObj = /** @type {Redis} */ (this.redis[dbConn]);
+        const mysqlObj = /** @type {MySQL} */ (this.mysql[dbConn]);
+
+        if (redisObj != null) {
+            const result = await redisObj.client.hgetall(key);
+            if (result != null) {
+                for (let i in result) {
+                    try {
+                        rtn.push(JSON.parse(result[i]));
+                    } catch (e) {
+                        throw e;
+                    }
+                }
+            }
+        }
+
+        if (mysqlObj != null && query != null && rtn.length <= 0) {
+            rtn = [];
+
+            let records = await mysqlObj.makeAndQuery(query);
+            for (let i in records) {
+                if (redisObj != null && records[i].idx != null) {
+                    await redisObj.client.hset(key, records[i].idx, records[i]);
+                }
+                rtn.push(records[i]);
+            }
+        }
+
+        return rtn;
     }
 }
 
