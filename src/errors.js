@@ -43,6 +43,12 @@ const errors = {
         code: 10004,
         message: 'invalid response data',
     },
+
+    // Account
+    invalidAccountId: {
+        code: 11001,
+        message: 'invalid account id',
+    },
 };
 
 module.exports = errors;

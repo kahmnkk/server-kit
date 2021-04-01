@@ -1,20 +1,22 @@
 // Common
 const errors = require('@src/errors');
+const dbMgr = require('@src/database/dbMgr');
 
 // Utils
 const utils = require('@src/utils/utils');
 
+// Model
+const Account = require('@src/model/account');
+const User = require('@src/model/user');
+
 class RouterUser {
     constructor() {}
 
-    /**
-     *
-     * @param {Object} reqDto
-     */
     async join(reqDto) {
         const reqKeys = {
             id: 'id',
             pw: 'pw',
+            nickname: 'nickname',
         };
         const resKeys = {
             idx: 'idx',
@@ -25,9 +27,27 @@ class RouterUser {
             throw utils.errorHandling(errors.invalidRequestData);
         }
 
-        // to-do query
+        const id = reqDto[reqKeys.id];
+        const pw = reqDto[reqKeys.pw];
+        const nickname = reqDto[reqKeys.nickname];
 
-        rtn[resKeys.idx] = 1;
+        const account = new Account();
+
+        const validId = await account.validId(id);
+        if (validId == false) {
+            throw utils.errorHandling(errors.invalidAccountId);
+        }
+
+        const accResult = await account.createAccountInfo(id, pw);
+
+        const user = new User(accResult.user.idx);
+        const userResult = await user.createUserInfo(nickname);
+
+        await dbMgr.set(dbMgr.mysqlConn.master, accResult.query);
+        await dbMgr.set(dbMgr.mysqlConn.user, userResult.query);
+
+        rtn[resKeys.idx] = accResult.user.idx;
+
         return rtn;
     }
 }
