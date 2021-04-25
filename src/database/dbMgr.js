@@ -28,6 +28,11 @@ const queryFrame = {
     cmds: [],
 };
 
+const multiSetFrame = {
+    conn: null,
+    query: /** @type {queryFrame} */ (null),
+};
+
 class dbMgr extends BaseModel {
     constructor() {
         super();
@@ -53,6 +58,15 @@ class dbMgr extends BaseModel {
      */
     getQueryFrame(initData = null) {
         const rtn = super.getFrame(queryFrame, initData);
+        return rtn;
+    }
+
+    /**
+     * @override
+     * @returns {multiSetFrame}
+     */
+    getMultiSetFrame(initData = null) {
+        const rtn = super.getFrame(multiSetFrame, initData);
         return rtn;
     }
 
@@ -111,6 +125,49 @@ class dbMgr extends BaseModel {
                 await redisObj.multiCmd(querys.cmds);
             } catch (err) {
                 throw err;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {Array<multiSetFrame>} multiSetFrames
+     */
+    async multiSet(multiSetFrames) {
+        const tempMysqls = [];
+        for (let i in multiSetFrames) {
+            if (multiSetFrames[i].query.querys.length > 0 || this.mysql[multiSetFrames[i].conn] != null) {
+                const mysqlObj = /** @type {MySQL} */ (this.mysql[multiSetFrames[i].conn]);
+                const mysqlConn = await mysqlObj.beginTransaction();
+                const mysqlQuerys = mysqlObj.makeMultipleQuery(multiSetFrames[i].query.querys);
+
+                tempMysqls.push({ mysqlObj, mysqlConn, mysqlQuerys });
+            }
+        }
+        try {
+            for (let i in tempMysqls) {
+                await tempMysqls[i].mysqlObj.query(tempMysqls[i].mysqlConn, tempMysqls[i].mysqlQuerys);
+            }
+            for (let i in tempMysqls) {
+                await tempMysqls[i].mysqlObj.commit(tempMysqls[i].mysqlConn);
+            }
+        } catch (err) {
+            for (let i in tempMysqls) {
+                await tempMysqls[i].mysqlObj.rollback(tempMysqls[i].mysqlConn);
+                throw err;
+            }
+        }
+
+        for (let i in multiSetFrames) {
+            if (multiSetFrames[i].query.cmds.length > 0 || this.redis[multiSetFrames[i].conn] != null) {
+                const redisObj = /** @type {Redis} */ (this.redis[multiSetFrames[i].conn]);
+
+                try {
+                    // Redis Set
+                    await redisObj.multiCmd(multiSetFrames[i].query.cmds);
+                } catch (err) {
+                    throw err;
+                }
             }
         }
     }
