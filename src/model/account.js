@@ -55,6 +55,28 @@ class Account extends BaseModel {
         return result;
     }
 
+    /**
+     *
+     * @param {String} inputPW
+     * @param {accountFrame} accountInfo
+     */
+    async validAccount(inputPW, accountInfo) {
+        let rtn = false;
+
+        if (accountInfo.status < status.default) {
+            throw utils.errorHandling(errors.invalidAccountStatus);
+        }
+
+        const cryptoResult = await utils.injectPromise(crypto.pbkdf2, inputPW, accountInfo.salt, 10000, 64, 'sha512');
+        const cryptoPassword = cryptoResult.toString('hex');
+
+        if (cryptoPassword == accountInfo.pw) {
+            rtn = true;
+        }
+
+        return rtn;
+    }
+
     async createAccountInfo(id, pw) {
         let rtn = {
             user: this.getFrame(),

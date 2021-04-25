@@ -56,12 +56,11 @@ async function index(req, res) {
         switch (reqRouter) {
             case ROUTERS.join:
                 resDto = await routerUser.join(reqDto);
-                session.addValue(req, 'idx', resDto.idx);
                 break;
 
             case ROUTERS.login:
-                // resDto = await routerUser.login(reqDto);
-                // session.addValue(req, 'idx', resDto.idx);
+                resDto = await routerUser.login(reqDto);
+                session.addValue(req, 'idx', resDto.idx);
                 break;
 
             default:

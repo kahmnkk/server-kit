@@ -45,9 +45,17 @@ const errors = {
     },
 
     // Account
-    invalidAccountId: {
+    invalidAccountIdPw: {
         code: 11001,
-        message: 'invalid account id',
+        message: 'invalid account id or pw',
+    },
+    invalidAccountStatus: {
+        code: 11002,
+        message: 'invalid account status',
+    },
+    duplicatedAccountId: {
+        code: 11003,
+        message: 'duplicated account id',
     },
 };
 

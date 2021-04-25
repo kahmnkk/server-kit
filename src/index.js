@@ -5,7 +5,7 @@ const config = require('@root/config');
 const errors = require('@src/errors');
 
 const service = require('@src/service/service');
-const ApiService = require('@src/service/ApiService');
+const ApiService = require('@src/service/apiService');
 
 const utils = require('@src/utils/utils');
 const logger = require('@src/utils/logger');
