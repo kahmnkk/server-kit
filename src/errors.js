@@ -26,7 +26,7 @@ const errors = {
         message: 'failed cache',
     },
 
-    // Api
+    // Common
     invalidSessionStore: {
         code: 10001,
         message: 'invalid session store',

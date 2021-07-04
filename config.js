@@ -3,6 +3,7 @@ const config = {
     baseUrl: '127.0.0.1',
     port: {
         api: 8080,
+        socket: 8181,
     },
     mysql: {
         master: {

@@ -6,6 +6,7 @@ const errors = require('@src/errors');
 
 const service = require('@src/service/service');
 const ApiService = require('@src/service/apiService');
+const SocketService = require('@src/service/socketService');
 
 const utils = require('@src/utils/utils');
 const logger = require('@src/utils/logger');
@@ -25,6 +26,20 @@ async function initApiService() {
     });
 }
 
+async function initSocketService() {
+    const socketService = new SocketService({
+        port: config.port.socket,
+        pubsubInfo: config.redis.pubsub,
+    });
+
+    await socketService.init();
+    await socketService.run((err) => {
+        if (err) throw err;
+        logger.info('socket service running.');
+        service.socket = socketService;
+    });
+}
+
 async function proc(serverType) {
     try {
         logger.init(serverType);
@@ -32,6 +47,10 @@ async function proc(serverType) {
         switch (serverType) {
             case 'api':
                 await initApiService();
+                break;
+
+            case 'socket':
+                await initSocketService();
                 break;
 
             default:
