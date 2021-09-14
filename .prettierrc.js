@@ -4,12 +4,6 @@
 // http://json.schemastore.org/prettierrc
 // https://www.codereadability.com/automated-code-formatting-with-prettier/
 
-// how to
-// $ (sudo )npm install prettier --global
-// $ cd refact-server
-// $ prettier --config .prettierrc.js './src/**/*.js' --check
-// $ prettier --config .prettierrc.js './src/**/*.js' --write
-
 module.exports = {
     bracketSpacing: true,
     jsxBracketSameLine: true,
