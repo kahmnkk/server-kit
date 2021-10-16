@@ -98,13 +98,11 @@ class SocketService {
         await time.syncTime();
     }
 
-    async run(callback) {
-        if (!callback) utils.promiseInjector(this.run);
-
+    run() {
         this.io.on('connect', (socket) => {
             logger.info('[' + socket.id + '] socket connected');
 
-            for(let msg in messages) {
+            for (let msg in messages) {
                 socket.on(msg, (data) => {
                     const socketMgr = new SocketMgr(socket, msg);
                     socketMgr.message(data);
@@ -116,7 +114,7 @@ class SocketService {
             });
         });
 
-        callback();
+        logger.info('socket service running.');
     }
 }
 

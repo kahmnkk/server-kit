@@ -19,11 +19,8 @@ async function initApiService() {
     });
 
     await apiService.init();
-    await apiService.run((err) => {
-        if (err) throw err;
-        logger.info('api service running.');
-        service.api = apiService;
-    });
+    apiService.run();
+    service.api = apiService;
 }
 
 async function initSocketService() {
@@ -33,11 +30,8 @@ async function initSocketService() {
     });
 
     await socketService.init();
-    await socketService.run((err) => {
-        if (err) throw err;
-        logger.info('socket service running.');
-        service.socket = socketService;
-    });
+    socketService.run();
+    service.socket = socketService;
 }
 
 async function proc(serverType) {

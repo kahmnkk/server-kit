@@ -92,11 +92,10 @@ class ApiService {
         await time.syncTime();
     }
 
-    async run(callback) {
-        if (!callback) utils.promiseInjector(this.run);
-
+    run() {
         this.app.listen(this.port, (err) => {
-            callback(err);
+            if (err) throw err;
+            logger.info('api service running.');
         });
     }
 }
